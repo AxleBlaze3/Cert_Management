@@ -43,7 +43,7 @@ app.get('/verify',requireAuth,(req,res)=>{
     res.send(`You are indeed logged in! Email: ${req.user.email}`)
 })
 
-app.get('/',()=>{
+app.get('/',(req,res)=>{
     res.send("hello")
 })
 
