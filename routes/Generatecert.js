@@ -52,7 +52,7 @@ router.post('/generatecert',requireAuth,async(req,res)=>{
         ck = keys.clientKey
         csr = keys.csr
 
-        return res.json({csr:csr})
+        return res.json({csr:csr,ck:ck})
         
        
 
