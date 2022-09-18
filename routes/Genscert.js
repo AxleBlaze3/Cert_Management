@@ -80,7 +80,7 @@ router.post('/createrootsigned',requireAuth,[
         console.log('failed')
         console.log(err)
         
-        return res.json({error:"Couldn't create certificate."})
+        return res.json({error:"Couldn't create certificate. 1290"})
     }
 
     try{
@@ -117,7 +117,7 @@ router.post('/createrootsigned',requireAuth,[
         
 
     }catch(err){
-        return res.json({error:"Couldn't create certificate."})
+        return res.json({error:"Couldn't create certificate. 188"})
     }
 
     console.log(id)
@@ -160,7 +160,7 @@ router.post('/createrootsigned',requireAuth,[
              cipherkey = CryptoJS.AES.encrypt(keys.clientKey,process.env.SECRET_KEY).toString()
              cipherconf = CryptoJS.AES.encrypt(confData,process.env.SECRET_KEY).toString()
         }catch(err){
-            return res.json({error:"Couldn't create certificate."})
+            return res.json({error:"Couldn't create certificate. 116"})
         }
         
         const newCert = new Cert({
@@ -230,7 +230,7 @@ router.post('/createrootsigned',requireAuth,[
             success = await transporter.sendMail(mailOptions)
             
         }catch(err){
-            return res.json({error:"Couldn't create certificate."})
+            return res.json({error:"Couldn't create certificate. 115"})
         }
         
 
@@ -238,7 +238,7 @@ router.post('/createrootsigned',requireAuth,[
             success = fs.rmSync(id, { recursive: true, force: true });
             
         }catch(err){
-            return res.json({error:"Couldn't create certificate."})
+            return res.json({error:"Couldn't create certificate 114."})
         }
 
         return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.clientKey,certid:id2,csr:keys.csr})
