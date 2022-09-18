@@ -16,6 +16,12 @@ const certvalid=require('./routes/Certvalid')
 const signin = require('./routes/Signin')
 const user_certs = require('./routes/Getusercerts')
 const generatecert = require('./routes/Generatecert')
+const localca = require('./routes/Localca')
+const scert = require('./routes/Genscert')
+
+
+const certft = require('./routes/TestBuffer')
+
 const port = process.env.PORT || 3000
 var cors = require('cors')
 app.use(bodyParser.json())
@@ -27,6 +33,12 @@ app.use(certvalid)
 app.use(signin)
 app.use(user_certs)
 app.use(generatecert)
+app.use(localca)
+app.use(scert)
+
+
+app.use(certft)
+
 app.use(cors())
 
 

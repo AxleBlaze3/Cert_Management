@@ -15,10 +15,10 @@ const nodemailer = require('nodemailer');
 
 
 
-router.post('/createselfsigned',requireAuth,[
+router.post('/createrootsigned',requireAuth,[
 
     check('commonName').not().isEmpty().withMessage('Common Name Required.').isURL().withMessage("Not a valid domain"),
-    check('basicConstraints').not().isEmpty().withMessage('Common Name Required.').contains("CA:false").withMessage("Invalid Parameters"),
+    check('basicConstraints').not().isEmpty().withMessage('Basic Constraints Required.').contains("CA:false").withMessage("Invalid Parameters"),
 ],async(req,res)=>{
 
     const errs = validationResult(req)
@@ -33,6 +33,8 @@ router.post('/createselfsigned',requireAuth,[
     let cert
     let ciphertext
     let pk
+    let datac
+    let bytes
     const {
         days,
         countryName,
@@ -67,6 +69,7 @@ router.post('/createselfsigned',requireAuth,[
         if (err) {
             return res.json({error:"Couldn't create certificate."})
         }
+        console.log(id)
         console.log("Directory is created.");
     })
         
@@ -74,15 +77,60 @@ router.post('/createselfsigned',requireAuth,[
     try{
         success = fs.writeFileSync(id+"/myConf.conf", confData)
     }catch(err){
+        
         return res.json({error:"Couldn't create certificate."})
     }
+
+    try{
+        id_m = process.env.RCA
+        datac=await Cert.findOne({_id:id_m})
+        cert=datac.cert
+        
+
+
+    }catch(err){
+        return res.json({error:"Couldn't fetch certificates"})
+    }
+    try{
+        datac = await Pk.findOne({certId:id_m})
+        pk = datac.pk 
+    }catch(err){
+
+        return res.json({error:"Couldn't fetch Private Key"})
+    }
+
+    try{
+        bytes  = CryptoJS.AES.decrypt(cert, process.env.SECRET_KEY);
+        cert = bytes.toString(CryptoJS.enc.Utf8);
+        
+
+    }catch(err){
+        return res.json({error:"Couldn't create certificate."})
+    }
+
+    try{
+        bytes  = CryptoJS.AES.decrypt(pk, process.env.SECRET_KEY);
+        pk = bytes.toString(CryptoJS.enc.Utf8);
+        console.log(pk)
+        
+
+    }catch(err){
+        return res.json({error:"Couldn't create certificate."})
+    }
+
+    console.log(id)
+
+
+
 
     
 
 
 
-    pem.createCertificate({ csrConfigFile:id+'/myConf.conf',days:days,selfSigned:true,extFile:'./host-ext.conf' }, async function (err, keys) {
+    pem.createCertificate({ csrConfigFile:'myConf.conf',days:days,serviceKey:pk,serviceCertificate:cert,extFile:'./host-ext.conf'}, async function (err, keys) {
         if (err) {
+            console.log(err)
+            
           return res.json({error:"Couldn't create certificate."})
         }
 
@@ -94,7 +142,7 @@ router.post('/createselfsigned',requireAuth,[
         }
 
         try{
-            success = fs.writeFileSync(id+"/"+id2+".key", keys.serviceKey)
+            success = fs.writeFileSync(id+"/"+id2+".key", keys.clientKey)
         }catch(err){
             console.log("Write Failed")
         }
@@ -107,7 +155,7 @@ router.post('/createselfsigned',requireAuth,[
         
         try{
              ciphertext = CryptoJS.AES.encrypt(keys.certificate, process.env.SECRET_KEY).toString();
-             cipherkey = CryptoJS.AES.encrypt(keys.serviceKey,process.env.SECRET_KEY).toString()
+             cipherkey = CryptoJS.AES.encrypt(keys.clientKey,process.env.SECRET_KEY).toString()
              cipherconf = CryptoJS.AES.encrypt(confData,process.env.SECRET_KEY).toString()
         }catch(err){
             return res.json({error:"Couldn't create certificate."})
@@ -117,7 +165,7 @@ router.post('/createselfsigned',requireAuth,[
             _id:id2,
             cert:ciphertext,
             email:req.user.email,
-            type:"SS",
+            type:"CAS",
             domain:commonName,
             conf:cipherconf
 
@@ -126,7 +174,7 @@ router.post('/createselfsigned',requireAuth,[
         const newPk = new Pk({
             certId: id2,
             pk: cipherkey,
-            type:"SS"
+            type:"CAS"
         });
 
         try {
@@ -191,7 +239,7 @@ router.post('/createselfsigned',requireAuth,[
             return res.json({error:"Couldn't create certificate."})
         }
 
-        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.serviceKey,csr:keys.csr,certid:id2})
+        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.clientKey,certid:id2,csr:keys.csr})
 
         
 
