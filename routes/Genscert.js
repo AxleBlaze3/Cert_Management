@@ -77,6 +77,7 @@ router.post('/createrootsigned',requireAuth,[
     try{
         success = fs.writeFileSync(id+"/myConf.conf", confData)
     }catch(err){
+        console.log('failed')
         
         return res.json({error:"Couldn't create certificate."})
     }
