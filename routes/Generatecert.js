@@ -65,12 +65,12 @@ router.post('/createselfsigned',requireAuth,[
     id = "./"+id
     let success
 
-    fs.mkdir(id, (err) => {
-        if (err) {
-            return res.json({error:"Couldn't create certificate."})
-        }
-        console.log("Directory is created.");
-    })
+    try{
+        success=fs.mkdirSync(id)
+    }catch(err){
+        return res.json({error:"Couldn't create certificate. 12900"})
+
+    }
         
 
     try{
@@ -83,7 +83,7 @@ router.post('/createselfsigned',requireAuth,[
 
 
 
-    pem.createCertificate({ csrConfigFile:id+'/myConf.conf',days:days,selfSigned:true,extFile:'./host-ext.conf' }, async function (err, keys) {
+    pem.createCertificate({ keyBitsize:keyBitSize,hash:csrSignAlgo,csrConfigFile:id+'/myConf.conf',days:days,selfSigned:true,extFile:'./host-ext.conf' }, async function (err, keys) {
         if (err) {
           return res.json({error:"Couldn't create certificate."})
         }

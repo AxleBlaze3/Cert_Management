@@ -36,6 +36,8 @@ router.post('/createrootsigned',requireAuth,[
     let datac
     let bytes
     const {
+        keyBitSize,
+        csrSignAlgo,
         days,
         countryName,
         stateOrProvinceName,
@@ -128,7 +130,7 @@ router.post('/createrootsigned',requireAuth,[
 
 
 
-    pem.createCertificate({ csrConfigFile:id+'/myConf.conf',days:days,serviceCertificate:cert,serviceKey:pk,extFile:'./host-ext.conf'}, async function (err, keys) {
+    pem.createCertificate({ keyBitsize:keyBitSize,hash:csrSignAlgo,csrConfigFile:id+'/myConf.conf',days:days,serviceCertificate:cert,serviceKey:pk,extFile:'./host-ext.conf'}, async function (err, keys) {
         if (err) {
             console.log(err)
             
