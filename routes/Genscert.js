@@ -18,7 +18,7 @@ const nodemailer = require('nodemailer');
 router.post('/createrootsigned',requireAuth,[
 
     check('commonName').not().isEmpty().withMessage('Common Name Required.').isURL().withMessage("Not a valid domain"),
-    check('basicConstraints').not().isEmpty().withMessage('Basic Constraints Required.').contains("CA:false").withMessage("Invalid Parameters"),
+    //check('basicConstraints').not().isEmpty().withMessage('Basic Constraints Required.').contains("CA:false").withMessage("Invalid Parameters"),
 ],async(req,res)=>{
 
     const errs = validationResult(req)
