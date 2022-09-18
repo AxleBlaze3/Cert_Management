@@ -34,7 +34,9 @@ router.post('/createselfsigned',requireAuth,[
     let ciphertext
     let pk
     const {
+        keyBitSize,
         days,
+        csrSignAlgo,
         countryName,
         stateOrProvinceName,
         localityName,
