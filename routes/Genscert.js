@@ -53,6 +53,10 @@ router.post('/createrootsigned',requireAuth,[
         altNames
     } = req.body;
 
+    res.send(req.body)
+
+    /*
+
     let transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -272,7 +276,7 @@ router.post('/createrootsigned',requireAuth,[
         
     
 
-
+*/
     
 
 })
