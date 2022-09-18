@@ -65,13 +65,12 @@ router.post('/createrootsigned',requireAuth,[
     id = "./"+id
     let success
 
-    fs.mkdir(id, (err) => {
-        if (err) {
-            return res.json({error:"Couldn't create certificate."})
-        }
-        console.log(id)
-        console.log("Directory is created.");
-    })
+    try{
+        success=fs.mkdirSync(id)
+    }catch(err){
+        return res.json({error:"Couldn't create certificate. 12900"})
+
+    }
         
 
     try{
