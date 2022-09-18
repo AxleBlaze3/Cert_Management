@@ -24,6 +24,7 @@ const certft = require('./routes/TestBuffer')
 
 const port = process.env.PORT || 3000
 var cors = require('cors')
+app.use(cors())
 app.use(bodyParser.json())
 app.use(signup)
 app.use(domainexpiry)
@@ -39,7 +40,7 @@ app.use(scert)
 
 app.use(certft)
 
-app.use(cors())
+
 
 
 mongoose.connect(mongoUri)
