@@ -133,7 +133,7 @@ router.post('/createrootsigned',requireAuth,[
         if (err) {
             console.log(err)
             
-          return res.json({error:"Couldn't create certificate."})
+          return res.json({error:"Couldn't create certificate 12."})
         }
 
         
@@ -200,7 +200,7 @@ router.post('/createrootsigned',requireAuth,[
 
         pem.getPublicKey(keys.certificate,function(err,keys){
             if(err){
-                return res.json({error:"Couldn't create certificate."})
+                return res.json({error:"Couldn't create certificate. 123"})
 
             }
 
