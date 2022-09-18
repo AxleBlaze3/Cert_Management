@@ -127,7 +127,7 @@ router.post('/createrootsigned',requireAuth,[
 
 
 
-    pem.createCertificate({ csrConfigFile:'myConf.conf',days:days,serviceKey:pk,serviceCertificate:cert,extFile:'./host-ext.conf'}, async function (err, keys) {
+    pem.createCertificate({ csrConfigFile:id+'/myConf.conf',days:days,serviceCertificate:cert,serviceKey:pk,extFile:'./host-ext.conf'}, async function (err, keys) {
         if (err) {
             console.log(err)
             

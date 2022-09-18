@@ -28,6 +28,8 @@ router.get('/user_certs',requireAuth,async(req,res)=>{
 
     try{
         data=await validateCertKeyPair(certif,pk)
+    }catch(err){
+        console.log(err)
     }
     
     
