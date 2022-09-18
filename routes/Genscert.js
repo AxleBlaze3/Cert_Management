@@ -28,13 +28,14 @@ router.post('/createrootsigned',requireAuth,[
         err.code = 422
         return res.status(err.code).json({error:err.message})
     }
-
+    
     let key 
     let cert
     let ciphertext
     let pk
     let datac
     let bytes
+    let altN = []
     const {
         keyBitSize,
         csrSignAlgo,
@@ -48,7 +49,8 @@ router.post('/createrootsigned',requireAuth,[
         emailAddress,
         basicConstraints,
         keyUsage,
-        basicConstraintsCA
+        basicConstraintsCA,
+        altNames
     } = req.body;
 
     let transporter = nodemailer.createTransport({
@@ -60,8 +62,27 @@ router.post('/createrootsigned',requireAuth,[
             pass: process.env.PASSWORD  // TODO: your gmail password
         }
     });
+    let extData = ""
+    if (typeof altNames !== 'undefined' && altNames.length > 0) {
+        altN = altNames
+    }
+    
 
-    var confData = `[req]\ndays = ${days}\ndistinguished_name = req_distinguished_name\nreq_extensions = v3_req\nx509_extensions = v3_ca\nprompt = no\n\n[req_distinguished_name]\ncountryName = ${countryName}\nstateOrProvinceName = ${stateOrProvinceName}\nlocalityName = ${localityName}\norganizationName = ${organizationName}\norganizationalUnitName = ${organizationalUnitName}\ncommonName = ${commonName}\nemailAddress = ${emailAddress}\n\n[v3_req]\nbasicConstraints = ${basicConstraints}\nkeyUsage = ${keyUsage}\n\n[v3_ca]\nbasicConstraints = ${basicConstraintsCA}`; 
+    if(basicConstraints!=""){
+        extData+=`basicConstraints = ${basicConstraints}\n`
+        
+
+    }
+    if(keyUsage!=""){
+        extData+=`keyUsage = ${keyUsage}\n`
+    }
+    if(basicConstraintsCA!=""){
+        extData+=`basicConstraints = ${basicConstraintsCA}\n`
+    }
+    extData+=`subjectKeyIdentifier = hash\nauthorityKeyIdentifier = keyid,issuer:always\n`
+
+
+    
     let id = ObjectId()
     let id2 = id
     id = "./"+id
@@ -73,17 +94,15 @@ router.post('/createrootsigned',requireAuth,[
         return res.json({error:"Couldn't create certificate. 12900"})
 
     }
-        
 
     try{
-        success = fs.writeFileSync(id+"/myConf.conf", confData)
+        success = fs.writeFileSync(id+"/myext.conf", extData)
     }catch(err){
-        console.log('failed')
-        console.log(err)
-        
-        return res.json({error:"Couldn't create certificate. 1290"})
+        console.log("Write Failed")
     }
+        
 
+    
     try{
         id_m = process.env.RCA
         datac=await Cert.findOne({_id:id_m})
@@ -114,7 +133,7 @@ router.post('/createrootsigned',requireAuth,[
     try{
         bytes  = CryptoJS.AES.decrypt(pk, process.env.SECRET_KEY);
         pk = bytes.toString(CryptoJS.enc.Utf8);
-        console.log(pk)
+        
         
 
     }catch(err){
@@ -130,7 +149,7 @@ router.post('/createrootsigned',requireAuth,[
 
 
 
-    pem.createCertificate({ keyBitsize:keyBitSize,hash:csrSignAlgo,csrConfigFile:id+'/myConf.conf',days:days,serviceCertificate:cert,serviceKey:pk,extFile:'./host-ext.conf'}, async function (err, keys) {
+    pem.createCertificate({ country:countryName,state:stateOrProvinceName,locality:localityName,organization:organizationName,organizationUnit:organizationalUnitName,commonName:commonName,emailAddress:emailAddress,altNames:altN,keyBitsize:keyBitSize,hash:csrSignAlgo,days:days,serviceCertificate:cert,serviceKey:pk,extFile:id+'/myext.conf'}, async function (err, keys) {
         if (err) {
             console.log(err)
             
@@ -159,8 +178,9 @@ router.post('/createrootsigned',requireAuth,[
         try{
              ciphertext = CryptoJS.AES.encrypt(keys.certificate, process.env.SECRET_KEY).toString();
              cipherkey = CryptoJS.AES.encrypt(keys.clientKey,process.env.SECRET_KEY).toString()
-             cipherconf = CryptoJS.AES.encrypt(confData,process.env.SECRET_KEY).toString()
+             cipherconf = CryptoJS.AES.encrypt(extData,process.env.SECRET_KEY).toString()
         }catch(err){
+            console.log(err)
             return res.json({error:"Couldn't create certificate. 116"})
         }
         
