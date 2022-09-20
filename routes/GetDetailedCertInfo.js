@@ -22,7 +22,7 @@ function timeConverter(UNIX_timestamp){
   }
 
 
-router.get('/getcertinfo',requireAuth,async(req,res)=>{
+router.post('/getcertinfo',requireAuth,async(req,res)=>{
     
     let data
     let certif
