@@ -5,6 +5,7 @@ const requireAuth = require('../middlewares/checkAuth')
 const Cert = mongoose.model('Cert')
 const Pk = mongoose.model('Pk')
 const CryptoJS = require("crypto-js");
+var pem = require('pem')
 const { validateCertKeyPair,validateSSL } = require('ssl-validator');
 const timestamp = require('unix-timestamp');
 function timeConverter(UNIX_timestamp){
@@ -65,19 +66,22 @@ router.get('/getcertinfo',requireAuth,async(req,res)=>{
         return res.json({error:"Couldn't fetch certificate."})
     }
 
-     try{
-        data=await validateCertKeyPair(certif,pk)
-    }catch(err){
-        return res.json({error:"Couldn't find any certificates"})
-    }
-
-    data.certInfo.validity.start=timeConverter(data.certInfo.validity.start/1000)
-    data.certInfo.validity.end=timeConverter(data.certInfo.validity.end/1000)
+    pem.readCertificateInfo(certif, function (err, data) {
+        if (err) {
+            throw err
+        }
+        
+        
+            
+        data.validity.start=timeConverter(data.validity.start/1000)
+        data.validity.end=timeConverter(data.validity.end/1000)
+        return res.send(data)
+    })
         
     
     
         
-    return res.send(data)
+    
 })
 
 module.exports = router
