@@ -8,7 +8,7 @@ const CryptoJS = require("crypto-js");
 const { validateCertKeyPair,validateSSL } = require('ssl-validator');
 const timestamp = require('unix-timestamp');
 let currentDate = Date.now()
-let lastWeek = Math.floor(+new Date() / 1000) + 30 * 24 * 60 * 60
+let lastWeek = Math.floor(+new Date() / 1000) + 7 * 24 * 60 * 60
 const nodemailer = require('nodemailer');
 var pem = require('pem')
 let endDate
