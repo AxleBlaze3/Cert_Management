@@ -19,6 +19,7 @@ const generatecert = require('./routes/Generatecert')
 const localca = require('./routes/Localca')
 const scert = require('./routes/Genscert')
 const detcert = require('./routes/GetDetailedCertInfo')
+const renewcertnotif = require('./routes/Certrenew')
 
 
 const certft = require('./routes/TestBuffer')
@@ -39,6 +40,7 @@ app.use(localca)
 app.use(scert)
 app.use(detcert)
 app.use(certft)
+app.use(renewcertnotif)
 
 
 
