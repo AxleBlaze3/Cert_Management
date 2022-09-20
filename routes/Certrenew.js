@@ -28,12 +28,17 @@ function timeConverter(UNIX_timestamp){
   let emailList = []
 
 
-router.get('/certrenewcheck',async(req,res)=>{
+router.get('/certrenewcheck',requireAuth,async(req,res)=>{
     let id
     let data
     let certif
     let data3
     const filter = {};
+
+    if(req.user.email!=="mongodb125@gmail.com"){
+        return res.json({error:"Couldn't find any certificates"})
+
+    }
 
     let dataArr=[]
     try{
