@@ -41,7 +41,7 @@ router.patch('/renewcert',requireAuth,async(req,res)=>{
         }
     });
 
-    if(!Number.isInteger(days)){
+    if(!Number.isInteger(days) && days>0){
         return res.json({error:"Couldn't create certificate."})
     }
 

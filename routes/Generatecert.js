@@ -17,7 +17,9 @@ const nodemailer = require('nodemailer');
 
 router.post('/createselfsigned',requireAuth,[
 
-    check('commonName').not().isEmpty().withMessage('Common Name Required.').isURL().withMessage("Not a valid domain"),
+    check('commonName').not().isEmpty().withMessage('Common Name Required.').isURL({require_protocol:false}).withMessage("Invalid URL"),
+    check('countryName').optional({checkFalsy:true}).isISO31661Alpha2().withMessage("Invalid country code. ISO 3166-1 alpha-2 standard followed."),
+    check('days').isNumeric({no_symbols:true}).withMessage("Days needs to be a number without any symbols.")
     //check('basicConstraints').not().isEmpty().withMessage('Common Name Required.').contains("CA:false").withMessage("Invalid Parameters"),
 ],async(req,res)=>{
 
