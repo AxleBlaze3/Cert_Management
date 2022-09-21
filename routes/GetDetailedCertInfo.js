@@ -6,6 +6,7 @@ const Cert = mongoose.model('Cert')
 const Pk = mongoose.model('Pk')
 const CryptoJS = require("crypto-js");
 var pem = require('pem')
+const fs = require('fs')
 const { validateCertKeyPair,validateSSL } = require('ssl-validator');
 const timestamp = require('unix-timestamp');
 function timeConverter(UNIX_timestamp){
@@ -21,9 +22,30 @@ function timeConverter(UNIX_timestamp){
     return time;
   }
 
+  id="./hey"
+  id2="hey_pub"
+
+  
+
 
 router.post('/getcertinfo',requireAuth,async(req,res)=>{
     
+   /* try{
+        success = fs.rmSync(id, { recursive: true, force: true });
+        
+    }catch(err){
+        return res.json({error:"Couldn't get certificate details."})
+    }*/
+    
+
+    try{
+        success=fs.mkdirSync(id)
+    }catch(err){
+        console.log(err)
+        return res.json({error:"Couldn't get certificate details."})
+
+    }
+    let pub
     let data
     let certif
     let bytes
@@ -37,6 +59,7 @@ router.post('/getcertinfo',requireAuth,async(req,res)=>{
         
 
     }catch(err){
+        console.log("hey")
         return res.json({error:"Couldn't find any certificates"})
     }
 
@@ -66,16 +89,52 @@ router.post('/getcertinfo',requireAuth,async(req,res)=>{
         return res.json({error:"Couldn't fetch certificate."})
     }
 
+    pem.getPublicKey(certif,function(err,keys){
+        if(err){
+            console.log(err)
+            return res.json({error:"Couldn't get certificate details."})
+
+        }
+
+        try{
+            success = fs.writeFileSync(id+"/"+id2+"public.key", keys.publicKey)
+        }catch(err){
+            console.log("Write Failed")
+        }
+
+        try{
+            pub = fs.readFileSync(id+"/"+id2+"public.key",{encoding:"utf-8"})
+
+        }catch(err){
+            console.log(err)
+            return res.json({error:"Couldn't get certificate details. 2"})
+        }
+
+        try{
+            success = fs.rmSync(id, { recursive: true, force: true });
+            
+        }catch(err){
+            return res.json({error:"Couldn't get certificate details."})
+        }
+
+    })
+
     pem.readCertificateInfo(certif, function (err, data) {
         if (err) {
-            throw err
+            console.log(err)
+            return res.json({error:"Couldn't get certificate details."})
         }
+
+        
+
+        
         
         
             
         data.validity.start=timeConverter(data.validity.start/1000)
         data.validity.end=timeConverter(data.validity.end/1000)
-        return res.send(data)
+        let dataf = {cert_info:data,pub:pub}
+        return res.json(dataf)
     })
         
     

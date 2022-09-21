@@ -30,6 +30,7 @@ router.post('/createselfsigned',requireAuth,[
     }
 
     let key 
+    let pub
     let cert
     let ciphertext
     let pk
@@ -194,9 +195,7 @@ router.post('/createselfsigned',requireAuth,[
             attachments: [
                 
                 { filename: id2+".crt", path: id+"/"+id2+".crt" },
-                { filename: id2+".csr", path: id+"/"+id2+".csr" },
-                { filename: id2+".key", path: id+"/"+id2+".key" },
-                { filename: id2+"public.key", path: id+"/"+id2+"public.key" }
+                
             ]
         };
         
@@ -206,6 +205,15 @@ router.post('/createselfsigned',requireAuth,[
         }catch(err){
             return res.json({error:"Couldn't create certificate."})
         }
+
+        try{
+            pub = fs.readFileSync(id+"/"+id2+"public.key",{encoding:"utf-8"})
+
+        }catch(err){
+            console.log(err)
+            return res.json({error:"Couldn't create certificate."})
+        }
+
         
 
         try{
@@ -215,7 +223,7 @@ router.post('/createselfsigned',requireAuth,[
             return res.json({error:"Couldn't create certificate."})
         }
 
-        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.serviceKey,csr:keys.csr,certid:id2})
+        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.serviceKey,csr:keys.csr,pub:pub,certid:id2})
 
         
 

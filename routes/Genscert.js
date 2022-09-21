@@ -30,6 +30,7 @@ router.post('/createrootsigned',requireAuth,[
     }
     
     let key 
+    let pub
     let cert
     let ciphertext
     let pk
@@ -141,7 +142,8 @@ router.post('/createrootsigned',requireAuth,[
         return res.json({error:"Couldn't create certificate. 188"})
     }
 
-    console.log(id)
+    //console.log(cert)
+    //console.log(pk)
 
 
 
@@ -242,9 +244,7 @@ router.post('/createrootsigned',requireAuth,[
             attachments: [
                 
                 { filename: id2+".crt", path: id+"/"+id2+".crt" },
-                { filename: id2+".csr", path: id+"/"+id2+".csr" },
-                { filename: id2+".key", path: id+"/"+id2+".key" },
-                { filename: id2+"public.key", path: id+"/"+id2+"public.key" }
+                
             ]
         };
         
@@ -253,6 +253,14 @@ router.post('/createrootsigned',requireAuth,[
             
         }catch(err){
             return res.json({error:"Couldn't create certificate. 115"})
+        }
+
+        try{
+            pub = fs.readFileSync(id+"/"+id2+"public.key",{encoding:"utf-8"})
+
+        }catch(err){
+            console.log(err)
+            return res.json({error:"Couldn't create certificate."})
         }
         
 
@@ -263,7 +271,7 @@ router.post('/createrootsigned',requireAuth,[
             return res.json({error:"Couldn't create certificate 114."})
         }
 
-        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.clientKey,certid:id2,csr:keys.csr})
+        return res.json({success:"Generated Certificate Successfully!",cert:keys.certificate,pk:keys.clientKey,certid:id2,pub:pub,csr:keys.csr})
 
         
 

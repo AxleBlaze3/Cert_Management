@@ -48,8 +48,8 @@ router.get('/user_certs',requireAuth,async(req,res)=>{
         certif=data3[i].cert
     
         try{
-            bytes  = CryptoJS.AES.decrypt(certif, process.env.SECRET_KEY);
-            certif = bytes.toString(CryptoJS.enc.Utf8);
+            bytes  = CryptoJS.AES.decrypt(data3[i].cert, process.env.SECRET_KEY);
+            data3[i].cert = bytes.toString(CryptoJS.enc.Utf8);
             
 
         }catch(err){
@@ -67,7 +67,7 @@ router.get('/user_certs',requireAuth,async(req,res)=>{
         */
         
         //data.certInfo.validity.end=timeConverter(data.certInfo.validity.end)
-    pem.readCertificateInfo(certif, function (err, data) {
+    pem.readCertificateInfo(data3[i].cert, function (err, data) {
         if (err) {
             throw err
         }
@@ -82,7 +82,7 @@ router.get('/user_certs',requireAuth,async(req,res)=>{
             data.validity.end=timeConverter(data.validity.end/1000)
         }
         let certinfo={
-            id:id,
+            id:data3[i]._id,
             country:data.country,
             state:data.state,
             locality:data.locality,
